@@ -16,3 +16,13 @@ F:\!coding\API-Assessment\API-Assessment\API-Assessment\obj\Debug\API-Assessment
 F:\!coding\API-Assessment\API-Assessment\API-Assessment\obj\Debug\API-Assessment.pdb
 F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\Newtonsoft.Json.dll
 F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\Newtonsoft.Json.xml
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\obj\Debug\API-Assessment.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\obj\Debug\API-Assessment.pdb
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\API-Assessment.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\API-Assessment.pdb
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Newtonsoft.Json.xml
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\nunit.framework.pdb
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\nunit.framework.xml
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\obj\Debug\API-Assessment.csprojResolveAssemblyReference.cache

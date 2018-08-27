@@ -10,22 +10,35 @@ namespace API_Assessment.Tests
     [TestFixture()]
     public class CompanyTests
     {
-        private readonly RestClient _client = new RestClient("https://mobilewebserver9-pokertest8ext.installprogram.eu/TestApi/api/automation/companies");
+        private RestClient _client;
+        private RESTHelper _sut;
+
+        [SetUp]
+        public void Initialize()
+        {
+            _sut = new RESTHelper();
+            _client = new RestClient("https://mobilewebserver9-pokertest8ext.installprogram.eu/TestApi/api/automation/companies");
+        }
+
+        [TearDown]
+        public void Dispose()
+        {
+            _sut = null;
+            _client = null;
+        }
 
         [Test]
         public void CreateCompany()
         {
-            RESTHelper token = new RESTHelper();
-            var response = token.CreateEntity(_client, "test"+ token.EntityCode);
+            var response = _sut.CreateEntity(_client, "test"+ _sut.EntityCode);
             Assert.That(response, Is.EqualTo("OK"));
         }
 
         [Test]
         public void GetAllCompanies()
         {
-            RESTHelper token = new RESTHelper();
-            var response = token.GetAllEntities(_client);
-            var parsed = token.ParseEntityResponse(response);
+            var response = _sut.GetAllEntities(_client);
+            var parsed = _sut.ParseEntityResponse(response);
 
             Assert.That(parsed.Count, Is.EqualTo(1));
         }
@@ -33,11 +46,17 @@ namespace API_Assessment.Tests
         [Test]
         public void GetCompanyById()
         {
-            RESTHelper token = new RESTHelper();
-            var response = token.GetEntityById(_client, 1);
+            var response = _sut.GetEntityById(_client, 2);
             var expectedResponse = "test";
             var companyById = JsonConvert.DeserializeObject<EntityModel>(response.Content);
             StringAssert.StartsWith(expectedResponse, companyById.Name);
+        }
+
+        [Test]
+        public void DeleteCompanyById()
+        {
+            var response = _sut.DeleteEntityById(_client, 3);
+            Assert.That(response.StatusCode.ToString(), Is.EqualTo("OK"));
         }
     }
 }
