@@ -34,7 +34,7 @@ namespace API_Assessment.Tests
         public void GetCompanyById()
         {
             RESTHelper token = new RESTHelper();
-            var response = token.GetEntityById(_client, 4);
+            var response = token.GetEntityById(_client, 1);
             var expectedResponse = "test";
             var companyById = JsonConvert.DeserializeObject<EntityModel>(response.Content);
             StringAssert.StartsWith(expectedResponse, companyById.Name);
