@@ -26,3 +26,5 @@ C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Newtonsoft.Json.xml
 C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\nunit.framework.pdb
 C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\nunit.framework.xml
 C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\obj\Debug\API-Assessment.csprojResolveAssemblyReference.cache
+F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\API-Assessment.dll.config
+F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\Json.NET.Web.dll

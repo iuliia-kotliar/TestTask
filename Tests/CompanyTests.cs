@@ -18,11 +18,16 @@ namespace API_Assessment.Tests
         {
             _sut = new RESTHelper();
             _client = new RestClient("https://mobilewebserver9-pokertest8ext.installprogram.eu/TestApi/api/automation/companies");
+            if (!_sut.DoesAnyEntityExist(_client))
+            {
+                _sut.DeleteAllEntities(_client);
+            }
         }
 
         [TearDown]
         public void Dispose()
         {
+            _sut.DeleteAllEntities(_client);
             _sut = null;
             _client = null;
         }
@@ -57,6 +62,30 @@ namespace API_Assessment.Tests
         {
             var response = _sut.DeleteEntityById(_client, 3);
             Assert.That(response.StatusCode.ToString(), Is.EqualTo("OK"));
+        }
+
+        [Test]
+        public void CompanyCreationIsSuccessful()
+        {
+            //TODO
+        }
+
+        [Test]
+        public void GetAllCompaniesWhenNoCompanyIsCreatedReturnsEmptyResponse()
+        {
+            //TODO
+        }
+
+        [Test]
+        public void GetAllCompaniesReturnsCollectionOfAllExistingCompanies()
+        {
+            //TODO
+        }
+
+        [Test]
+        public void GetCompanyByIdReturnsAppropriateResponse()
+        {
+            //TODO
         }
     }
 }

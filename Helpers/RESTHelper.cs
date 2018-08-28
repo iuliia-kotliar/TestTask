@@ -32,7 +32,7 @@ namespace API_Assessment.Helpers
         /// <summary>
         /// Creates token using predefined credentials and grant type.
         /// </summary>
-        /// <returns>'access_token' value in string format</returns>
+        /// <returns>Response from request execution</returns>
         internal IRestResponse CreateToken()
         {
             _client = new RestClient(LocationPath + TokenPath);
@@ -49,7 +49,7 @@ namespace API_Assessment.Helpers
         /// <param name="username">username value</param>
         /// <param name="password">password value</param>
         /// <param name="grantType">grant_type value</param>
-        /// <returns></returns>
+        /// <returns>Response from request execution</returns>
         internal IRestResponse CreateToken(string username, string password, string grantType)
         {
             _userName = username;
@@ -117,7 +117,7 @@ namespace API_Assessment.Helpers
         }
 
         /// <summary>
-        /// Deserializes JSON object into EntiTyModel fields
+        /// Deserializes JSON object into EntityModel fields
         /// </summary>
         /// <param name="response">Response from request execution</param>
         /// <returns>Collection with EntityModel fields</returns>
@@ -131,15 +131,37 @@ namespace API_Assessment.Helpers
         /// </summary>
         /// <param name="response">Response from request execution</param>
         /// <returns>Collection with TokenModel fields</returns>
-        internal List<TokenModel> ParseTokenResponse(IRestResponse response)
+        internal TokenModel ParseTokenResponse(IRestResponse response)
         {
-            return JsonConvert.DeserializeObject<List<TokenModel>>(response.Content);
+            return JsonConvert.DeserializeObject<TokenModel>(response.Content);
         }
 
+        internal bool DoesAnyEntityExist(RestClient client)
+        {
+            return GetAllEntities(client).Content.Length < 0;
+        }
+
+        internal void DeleteAllEntities(RestClient client)
+        {
+            var entities = GetAllEntities(client);
+            var responses = ParseEntityResponse(entities);
+            
+            foreach (var response in responses)
+            {
+                DeleteEntityById(client, response.Id);
+            }
+
+        }
+
+        /// <summary>
+        /// Gets 'access_token' value from response
+        /// </summary>
+        /// <returns>'access_token' value in string format</returns>
         private string GetAccessTokenValue()
         {
-            var response = CreateToken().Content;
-            var jsonResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(response)["access_token"].ToString();
+            var response = CreateToken();
+            //var jsonResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(response)["access_token"].ToString();
+            var jsonResponse = ParseTokenResponse(response).AccessToken;
             return jsonResponse;
         }
     }
