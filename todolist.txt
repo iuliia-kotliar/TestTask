@@ -1,0 +1,12 @@
+-tests to add-
+* check that get on empty entity returns zero
+* check that all the created companies are returned
+* get 404 status code
+* add entity with the same name is not allowed
+
+-stuff to do-
+* add error strings to asserts
+* check both response and that exists
+* more invalid token actions (not just post)
+* fix issue with tests failing when run with different createtoken method
+* add tests to employeetests
