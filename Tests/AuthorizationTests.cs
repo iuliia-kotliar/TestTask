@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Net;
 using RestSharp;
 using API_Assessment.Helpers;
 using NUnit.Framework;
@@ -10,6 +11,7 @@ namespace API_Assessment.Tests
     public class AuthorizationTests
     {
         private RESTHelper _sut;
+        private const string DateFormat = "ddd, dd MMM yyyy HH:mm:ss GMT";
 
         [SetUp]
         public void Initialize()
@@ -29,19 +31,19 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken();
             var code = response.StatusCode;
 
-            Assert.That(code, Is.EqualTo(System.Net.HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
-        public void IssuedPropertyIsAsExpectedInResponseBody()
+        public void IssuedAndExpiresPropertiesAreAsExpectedInResponseBody()
         {
             var response = _sut.CreateToken();
             var parsed = _sut.ParseTokenResponse(response);
-            var toGMT = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Greenwich Standard Time");
-            var stringToDateTime = DateTime.ParseExact(parsed.Issued, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-
-            Assert.That(parsed.Issued, Is.EqualTo(toGMT).Within(5).Seconds);
-            Assert.That(parsed.Expires, Is.EqualTo(DateTime.Now));
+            var nowTime = DateTime.Now;
+            var issuedToDateTime = DateTime.ParseExact(parsed.Issued, DateFormat, CultureInfo.InvariantCulture);
+            var iexpiresToDateTime = DateTime.ParseExact(parsed.Expires, DateFormat, CultureInfo.InvariantCulture);
+            Assert.That(issuedToDateTime, Is.EqualTo(nowTime).Within(2).Seconds);
+            Assert.That(iexpiresToDateTime, Is.EqualTo(nowTime.AddMinutes(5)).Within(2).Seconds);
         }
 
         [Test]
@@ -74,52 +76,55 @@ namespace API_Assessment.Tests
         [Test]
         public void CreateTokenWithEmptyCredentials()
         {
-            var response = _sut.CreateToken("", "", "password");
-            var code = response.StatusCode.ToString();
+            var code = CreateTokenAndGetStatusCode("", "", "password");
 
-            Assert.That(code, Is.EqualTo("OK"));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
         public void CreateTokenWithNullCredentials()
         {
-            var response = _sut.CreateToken(null, null, "password");
-            var code = response.StatusCode.ToString();
+            var code = CreateTokenAndGetStatusCode(null, null, "password");
 
-            Assert.That(code, Is.EqualTo("OK"));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
         public void CreateTokenWithUnauthorizedGrantType()
         {
-            var response = _sut.CreateToken("test", "test", "credentials");
-            var code = response.StatusCode.ToString();
+            var code = CreateTokenAndGetStatusCode("test", "test", "credentials");
 
-            Assert.That(code, Is.EqualTo("BadRequest"));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
         public void CreateTokenWithAlphaNumericCredentials()
         {
-            var response = _sut.CreateToken("asd123", "asd123", "password");
-            var code = response.StatusCode.ToString();
+            var code = CreateTokenAndGetStatusCode("asd123", "asd123", "password");
 
-            Assert.That(code, Is.EqualTo("OK"));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
         public void CreateTokenWithSpecialSymbolCredentials()
         {
-            var response = _sut.CreateToken("!@#", "$%^", "password");
-            var code = response.StatusCode.ToString();
+            var code = CreateTokenAndGetStatusCode("!@#", "$%^", "password");
 
-            Assert.That(code, Is.EqualTo("OK"));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
         }
 
-        [Test]
-        public void AccessWithInvalidTokenIsNotAllowed()
+        /// <summary>
+        /// Creates token and gets HTTP status code of the token creation request.
+        /// </summary>
+        /// <param name="username">username value</param>
+        /// <param name="password">password value</param>
+        /// <param name="grantType">gran_type value</param>
+        /// <returns></returns>
+        private HttpStatusCode CreateTokenAndGetStatusCode(string username, string password, string grantType)
         {
-            //TODO
+            var response = _sut.CreateToken(username, password, grantType);
+            var code = response.StatusCode;
+            return code;
         }
     }
 }

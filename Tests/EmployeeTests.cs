@@ -23,12 +23,5 @@ namespace API_Assessment.Tests
             _sut = null;
             _client = null;
         }
-
-        [Test]
-        public void CreateEmployee()
-        {
-            var response = _sut.CreateEntity(_client, "Jane" + _sut.EntityCode);
-            Assert.That(response, Is.EqualTo("OK"));
-        }
     }
 }

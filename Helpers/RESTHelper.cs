@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using API_Assessment.Models;
 using Newtonsoft.Json;
 
@@ -13,11 +14,12 @@ namespace API_Assessment.Helpers
         private static RestRequest _request;
         private const string LocationPath = "https://mobilewebserver9-pokertest8ext.installprogram.eu/TestApi";
         private const string TokenPath = "/token";
+        private const string InvalidAccessToken = null;
         private static string _userName = "testName";
         private static string _password = "test";
         private static string _grantType = "password";
         private readonly string _accessToken;
-        internal string EntityCode { get; } = Guid.NewGuid().GetHashCode().ToString(CultureInfo.InvariantCulture);
+        internal string EntityCode { get; set; } = Guid.NewGuid().GetHashCode().ToString(CultureInfo.InvariantCulture);
 
         public RESTHelper()
         {
@@ -64,14 +66,22 @@ namespace API_Assessment.Helpers
         /// <param name="client">RestClient to be used</param>
         /// <param name="entityName">Name to be given to the entity</param>
         /// <returns>Status code of the creation operation.</returns>
-        internal string CreateEntity(RestClient client, string entityName)
+        internal HttpStatusCode CreateEntityAndGetAStatusCode(RestClient client, string entityName)
         {
             _request = new RestRequest(Method.POST);
             _request.AddHeader("Authorization", "Bearer " + _accessToken);
             _request.AddParameter("undefined", $"{{\"Name\":\"{entityName}\"}}", ParameterType.RequestBody);
-            var response = (client.Execute(_request)).StatusCode.ToString();
+            var response = (client.Execute(_request)).StatusCode;
             return response;
 
+        }
+
+        internal void CreateEntity(RestClient client, string entityName)
+        {
+            _request = new RestRequest(Method.POST);
+            _request.AddHeader("Authorization", "Bearer " + _accessToken);
+            _request.AddParameter("undefined", $"{{\"Name\":\"{entityName}\"}}", ParameterType.RequestBody);
+            client.Execute(_request);
         }
 
         /// <summary>
@@ -101,6 +111,23 @@ namespace API_Assessment.Helpers
             return response;
         }
 
+        /// <summary>
+        /// Gets a list of entity's IDs
+        /// </summary>
+        /// <param name="client">RestClient to be used</param>
+        /// <returns>A list of integers values of the actual entity' IDs</returns>
+        internal List<int> GetActualIds(RestClient client)
+        {
+            var entityResponse = GetAllEntities(client);
+            var parsedResponses = ParseEntityResponse(entityResponse);
+            var actualIds = new List<int>();
+            foreach (var response in parsedResponses)
+            {
+                actualIds.Add(response.Id);
+            }
+
+            return actualIds;
+        }
 
         /// <summary>
         /// Deletes a specific entity by its Id.
@@ -136,16 +163,25 @@ namespace API_Assessment.Helpers
             return JsonConvert.DeserializeObject<TokenModel>(response.Content);
         }
 
+        /// <summary>
+        /// Verifies whether any entitity exists
+        /// </summary>
+        /// <param name="client">RestClient to be used</param>
+        /// <returns>Returns true if any entities exist</returns>
         internal bool DoesAnyEntityExist(RestClient client)
         {
-            return GetAllEntities(client).Content.Length < 0;
+            return GetAllEntities(client).Content.Length > 0;
         }
 
+        /// <summary>
+        /// Deletes all existing entitites
+        /// </summary>
+        /// <param name="client">RestClient to be used</param>
         internal void DeleteAllEntities(RestClient client)
         {
             var entities = GetAllEntities(client);
             var responses = ParseEntityResponse(entities);
-            
+            if (responses == null) return;
             foreach (var response in responses)
             {
                 DeleteEntityById(client, response.Id);
@@ -160,7 +196,6 @@ namespace API_Assessment.Helpers
         private string GetAccessTokenValue()
         {
             var response = CreateToken();
-            //var jsonResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(response)["access_token"].ToString();
             var jsonResponse = ParseTokenResponse(response).AccessToken;
             return jsonResponse;
         }

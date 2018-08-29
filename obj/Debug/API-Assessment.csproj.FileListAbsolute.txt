@@ -28,3 +28,10 @@ C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\nunit.framework.xml
 C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\obj\Debug\API-Assessment.csprojResolveAssemblyReference.cache
 F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\API-Assessment.dll.config
 F:\!coding\API-Assessment\API-Assessment\API-Assessment\bin\Debug\Json.NET.Web.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\API-Assessment.dll.config
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Json.NET.Web.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
+C:\Users\iuliia.kotliar\Documents\GitHub\TestTask\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
