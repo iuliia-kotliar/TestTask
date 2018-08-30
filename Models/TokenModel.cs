@@ -10,7 +10,6 @@ namespace API_Assessment.Models
         public string TokenType { get; set; }
         [JsonProperty(PropertyName = "expires_in")]
         public string ExpiresIn { get; set; }
-        public string RefreshToken { get; set; }
         public string DisplayName { get; set; }
         [JsonProperty(PropertyName = ".issued")]
         public string Issued { get; set; }

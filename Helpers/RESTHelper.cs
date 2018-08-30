@@ -14,7 +14,6 @@ namespace API_Assessment.Helpers
         private static RestRequest _request;
         private const string LocationPath = "https://mobilewebserver9-pokertest8ext.installprogram.eu/TestApi";
         private const string TokenPath = "/token";
-        private const string InvalidAccessToken = null;
         private static string _userName = "testName";
         private static string _password = "test";
         private static string _grantType = "password";
@@ -32,20 +31,6 @@ namespace API_Assessment.Helpers
         }
 
         /// <summary>
-        /// Creates token using predefined credentials and grant type.
-        /// </summary>
-        /// <returns>Response from request execution</returns>
-        internal IRestResponse CreateToken()
-        {
-            _client = new RestClient(LocationPath + TokenPath);
-            _request = new RestRequest(Method.POST);
-            _request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-            _request.AddParameter("undefined", $"username={_userName}&password={_password}&grant_type={_grantType}", ParameterType.RequestBody);
-            var response = _client.Execute(_request);
-            return response;
-        }
-
-        /// <summary>
         /// Creates token using credentials and grant type as parameters.
         /// </summary>
         /// <param name="username">username value</param>
@@ -54,10 +39,21 @@ namespace API_Assessment.Helpers
         /// <returns>Response from request execution</returns>
         internal IRestResponse CreateToken(string username, string password, string grantType)
         {
-            _userName = username;
-            _password = password;
-            _grantType = grantType;
-            return CreateToken();
+            _client = new RestClient(LocationPath + TokenPath);
+            _request = new RestRequest(Method.POST);
+            _request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            _request.AddParameter("undefined", $"username={username}&password={password}&grant_type={grantType}", ParameterType.RequestBody);
+            var response = _client.Execute(_request);
+            return response;
+        }
+
+        /// <summary>
+        /// Creates token using predefined credentials and grant type.
+        /// </summary>
+        /// <returns>Response from request execution</returns>
+        internal IRestResponse CreateToken()
+        {
+            return CreateToken(_userName, _password, _grantType);
         }
 
         /// <summary>
@@ -68,20 +64,18 @@ namespace API_Assessment.Helpers
         /// <returns>Status code of the creation operation.</returns>
         internal HttpStatusCode CreateEntityAndGetAStatusCode(RestClient client, string entityName)
         {
-            _request = new RestRequest(Method.POST);
-            _request.AddHeader("Authorization", "Bearer " + _accessToken);
-            _request.AddParameter("undefined", $"{{\"Name\":\"{entityName}\"}}", ParameterType.RequestBody);
-            var response = (client.Execute(_request)).StatusCode;
+            var response = (CreateEntity(client, entityName)).StatusCode;
             return response;
 
         }
 
-        internal void CreateEntity(RestClient client, string entityName)
+        internal IRestResponse CreateEntity(RestClient client, string entityName)
         {
             _request = new RestRequest(Method.POST);
             _request.AddHeader("Authorization", "Bearer " + _accessToken);
             _request.AddParameter("undefined", $"{{\"Name\":\"{entityName}\"}}", ParameterType.RequestBody);
-            client.Execute(_request);
+            var response = client.Execute(_request);
+            return response;
         }
 
         /// <summary>
@@ -125,8 +119,24 @@ namespace API_Assessment.Helpers
             {
                 actualIds.Add(response.Id);
             }
-
             return actualIds;
+        }
+
+        /// <summary>
+        /// Gets a list of entity's Names
+        /// </summary>
+        /// <param name="client">RestClient to be used</param>
+        /// <returns>A list of string values of the actual entity' Names</returns>
+        internal List<string> GetActualNames(RestClient client)
+        {
+            var entityResponse = GetAllEntities(client);
+            var parsedResponses = ParseEntityResponse(entityResponse);
+            var actualNames = new List<string>();
+            foreach (var response in parsedResponses)
+            {
+                actualNames.Add(response.Name);
+            }
+            return actualNames;
         }
 
         /// <summary>

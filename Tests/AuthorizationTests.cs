@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Net;
-using RestSharp;
 using API_Assessment.Helpers;
+using API_Assessment.Models;
 using NUnit.Framework;
 
 namespace API_Assessment.Tests
@@ -31,19 +31,26 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken();
             var code = response.StatusCode;
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK), "Status code after token creation was not 'Ok'.");
         }
 
         [Test]
         public void IssuedAndExpiresPropertiesAreAsExpectedInResponseBody()
         {
-            var response = _sut.CreateToken();
-            var parsed = _sut.ParseTokenResponse(response);
-            var nowTime = DateTime.Now;
+            var parsed = CreateTokenParseTokenResponseAndSetActualDateTime(out var nowTime);
             var issuedToDateTime = DateTime.ParseExact(parsed.Issued, DateFormat, CultureInfo.InvariantCulture);
-            var iexpiresToDateTime = DateTime.ParseExact(parsed.Expires, DateFormat, CultureInfo.InvariantCulture);
-            Assert.That(issuedToDateTime, Is.EqualTo(nowTime).Within(2).Seconds);
-            Assert.That(iexpiresToDateTime, Is.EqualTo(nowTime.AddMinutes(5)).Within(2).Seconds);
+
+            Assert.That(issuedToDateTime, Is.EqualTo(nowTime).Within(2).Seconds, "'.issued' property differs from expected.");
+        }
+
+        [Test]
+        public void ExpiresPropertyIsAsExpectedInResponseBody()
+        {
+            var parsed = CreateTokenParseTokenResponseAndSetActualDateTime(out var nowTime);
+            var expiresToDateTime = DateTime.ParseExact(parsed.Expires, DateFormat, CultureInfo.InvariantCulture);
+
+            Assert.That(expiresToDateTime, Is.EqualTo(nowTime.AddMinutes(5)).Within(2).Seconds, 
+                "'.expires' property differs from expected.");
         }
 
         [Test]
@@ -52,7 +59,7 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken();
             var parsed = _sut.ParseTokenResponse(response).TokenType;
 
-            Assert.That(parsed, Is.EqualTo("bearer"));
+            Assert.That(parsed, Is.EqualTo("bearer"), "'token_type' property differs from expected.");
         }
 
         [Test]
@@ -61,7 +68,7 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken();
             var parsed = _sut.ParseTokenResponse(response).ExpiresIn;
 
-            Assert.That(parsed, Is.EqualTo("299"));
+            Assert.That(parsed, Is.EqualTo("299"), "'expires_in' property differs from expected.");
         }
 
         [Test]
@@ -70,7 +77,7 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken();
             var parsed = _sut.ParseTokenResponse(response).DisplayName;
 
-            Assert.That(parsed, Is.EqualTo("testName_alias"));
+            Assert.That(parsed, Is.EqualTo("testName_alias"), "'displayName' property differs from expected.");
         }
 
         [Test]
@@ -78,7 +85,7 @@ namespace API_Assessment.Tests
         {
             var code = CreateTokenAndGetStatusCode("", "", "password");
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK), "Creating token with empty credentials is not allowed, but should be.");
         }
 
         [Test]
@@ -86,7 +93,7 @@ namespace API_Assessment.Tests
         {
             var code = CreateTokenAndGetStatusCode(null, null, "password");
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK), "Creating token with null credentials is not allowed, but should be.");
         }
 
         [Test]
@@ -94,7 +101,8 @@ namespace API_Assessment.Tests
         {
             var code = CreateTokenAndGetStatusCode("test", "test", "credentials");
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.BadRequest), 
+                "Creating token with the wrong grant type is  allowed, but should not be.");
         }
 
         [Test]
@@ -102,7 +110,8 @@ namespace API_Assessment.Tests
         {
             var code = CreateTokenAndGetStatusCode("asd123", "asd123", "password");
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK), 
+                "Creating token with alphanumeric credentials is not allowed, but should be.");
         }
 
         [Test]
@@ -110,7 +119,8 @@ namespace API_Assessment.Tests
         {
             var code = CreateTokenAndGetStatusCode("!@#", "$%^", "password");
 
-            Assert.That(code, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(code, Is.EqualTo(HttpStatusCode.OK), 
+                "Creating token with special symbol credentials is not allowed, but should be.");
         }
 
         /// <summary>
@@ -125,6 +135,19 @@ namespace API_Assessment.Tests
             var response = _sut.CreateToken(username, password, grantType);
             var code = response.StatusCode;
             return code;
+        }
+
+        /// <summary>
+        /// Creates token, parses JSON response and sets actual DateTime.
+        /// </summary>
+        /// <param name="nowTime">Actual time at the moment of assigment; is passed by reference</param>
+        /// <returns>Parsed TokenModel values</returns>
+        private TokenModel CreateTokenParseTokenResponseAndSetActualDateTime(out DateTime nowTime)
+        {
+            var response = _sut.CreateToken();
+            var parsed = _sut.ParseTokenResponse(response);
+            nowTime = DateTime.Now;
+            return parsed;
         }
     }
 }
